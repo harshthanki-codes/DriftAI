@@ -44,10 +44,10 @@ class ReviewResult(BaseModel):
 api_keys = [os.environ.get(f"GEMINI_API_KEY_{i}") for i in range(1, 6) if os.environ.get(f"GEMINI_API_KEY_{i}")]
 
 if api_keys:
-    llms = [ChatGoogleGenerativeAI(model="gemini-3.6-flash", temperature=0, callbacks=[token_tracker], api_key=key) for key in api_keys]
+    llms = [ChatGoogleGenerativeAI(model="gemini-3.5-flash-lite", temperature=0, max_retries=0, callbacks=[token_tracker], api_key=key) for key in api_keys]
     llm = llms[0].with_fallbacks(llms[1:]) if len(llms) > 1 else llms[0]
 else:
-    llm = ChatGoogleGenerativeAI(model="gemini-3.6-flash", temperature=0, callbacks=[token_tracker])
+    llm = ChatGoogleGenerativeAI(model="gemini-3.5-flash-lite", temperature=0, max_retries=0, callbacks=[token_tracker])
 
 # --- Nodes ---
 def worker_node(state: AgentState):

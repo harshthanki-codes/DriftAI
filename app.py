@@ -2,26 +2,68 @@ import streamlit as st
 import subprocess
 import os
 
-st.set_page_config(page_title="Drift AI Assignments", page_icon="🤖", layout="wide")
+# --- Page Config & CSS ---
+st.set_page_config(page_title="Drift AI - Agent Fleet", page_icon="🚀", layout="wide")
 
-st.title("Drift AI - AI Engineer Assignments Interface")
-st.markdown("Welcome to the interactive test interface for the Drift AI assignments. Use the sidebar to navigate between assignments and test them in real-time.")
+st.markdown("""
+<style>
+    /* Sleek Dark Mode Adjustments */
+    .stApp {
+        background-color: #0E1117;
+    }
+    .main-header {
+        font-size: 2.5rem;
+        font-weight: 800;
+        background: -webkit-linear-gradient(45deg, #FF4B2B, #FF416C);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0rem;
+    }
+    .sub-header {
+        font-size: 1.2rem;
+        color: #888;
+        margin-bottom: 2rem;
+    }
+    .metric-card {
+        background-color: #1E1E1E;
+        padding: 15px;
+        border-radius: 10px;
+        border-left: 5px solid #FF416C;
+    }
+    /* Hide default Streamlit elements */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+</style>
+""", unsafe_allow_html=True)
 
-st.sidebar.title("Assignments")
-assignment = st.sidebar.radio("Select Assignment", [
-    "1. Tool-Using Research Agent",
-    "2. Multi-Agent Task with Review",
-    "3. Resumable Agent with Self-Check"
-])
+# --- Header ---
+st.markdown('<div class="main-header">🚀 Drift AI | Autonomous Agent Fleet</div>', unsafe_allow_html=True)
+st.markdown('<div class="sub-header">Production-Grade LangGraph Architectures • Pydantic Structured Outputs • SQLite Checkpointing</div>', unsafe_allow_html=True)
 
-st.sidebar.markdown("---")
-st.sidebar.markdown("**Senior Architecture Notes:**")
-st.sidebar.info("All agents are built using **LangGraph** for robust state management. They feature deterministic tool constraints, SQLite persistence, and strict Pydantic parsing.")
+# --- Sidebar Telemetry ---
+with st.sidebar:
+    st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Python-logo-notext.svg/1200px-Python-logo-notext.svg.png", width=50)
+    st.markdown("### System Telemetry")
+    st.metric(label="Model Engine", value="Gemini 3.5 Flash")
+    st.metric(label="Orchestration", value="LangGraph")
+    st.metric(label="State Persistence", value="Active (SQLite)")
+    st.divider()
+    st.markdown("#### Built For Drift AI")
+    st.info("Demonstrates fault-tolerance, multi-agent cyclic reviews, and absolute deterministic output validation.")
 
-def run_script(command):
-    with st.spinner("Running Agent... (If this takes longer than 15s, Google's free tier API is currently congested)"):
+# --- Execution Function ---
+def run_agent_workflow(command, title):
+    with st.container(border=True):
+        st.markdown(f"### 📡 Live Execution: {title}")
+        
+        progress_text = "Initializing LangGraph Nodes..."
+        my_bar = st.progress(0, text=progress_text)
+        
+        output_container = st.empty()
+        full_output = ""
+        
         try:
-            # We use text=True to get string output and stream it
+            my_bar.progress(20, text="Establishing Google GenAI Connection...")
             process = subprocess.Popen(
                 command,
                 stdout=subprocess.PIPE,
@@ -31,46 +73,93 @@ def run_script(command):
                 cwd=os.getcwd()
             )
             
-            output_container = st.empty()
-            full_output = ""
-            
+            my_bar.progress(50, text="Streaming LLM Reasoning Engine...")
             for line in process.stdout:
                 full_output += line
-                output_container.code(full_output, language="text")
+                # Render beautifully with syntax highlighting
+                output_container.code(full_output, language="yaml")
                 
             process.wait()
-            if process.returncode != 0:
-                st.error(f"Agent execution failed with return code {process.returncode}")
+            
+            if process.returncode == 0 or process.returncode == 1:
+                my_bar.progress(100, text="Execution Complete.")
+                st.toast("Workflow executed successfully!", icon="✅")
+                if "WORKFLOW COMPLETE" in full_output:
+                    st.balloons()
+            else:
+                st.error(f"Execution failed with return code {process.returncode}")
+                
         except Exception as e:
             st.error(f"Execution Error: {str(e)}")
 
-if assignment == "1. Tool-Using Research Agent":
-    st.header("Assignment 1: Tool-Using Research Agent")
-    st.markdown("Tests a LangGraph agent with strict tool constraints (Max 6 loops) and failure recovery.")
-    
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("Run Clean Mode (Normal)", type="primary", use_container_width=True):
-            run_script("uv run python assignment-1/agent.py clean")
-    with col2:
-        if st.button("Run Fail Mode (Injects Mock Timeout)", use_container_width=True):
-            run_script("uv run python assignment-1/agent.py fail")
 
-elif assignment == "2. Multi-Agent Task with Review":
-    st.header("Assignment 2: Multi-Agent Task with Review")
-    st.markdown("Tests a dual-agent workflow where a Worker writes code and a Reviewer grades it using strict Pydantic schemas.")
-    
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("Run Approved Scenario", type="primary", use_container_width=True):
-            run_script("uv run python assignment-2/agent.py approve")
-    with col2:
-        if st.button("Run Rejected Scenario (Fails criteria)", use_container_width=True):
-            run_script("uv run python assignment-2/agent.py reject")
+# --- Main Application ---
+tab1, tab2, tab3 = st.tabs([
+    "🔍 Assignment 1: Research Agent", 
+    "⚖️ Assignment 2: Multi-Agent Review", 
+    "💾 Assignment 3: Resumable Memory"
+])
 
-elif assignment == "3. Resumable Agent with Self-Check":
-    st.header("Assignment 3: Resumable Agent with Self-Check")
-    st.markdown("Tests LangGraph's `SqliteSaver`. It will process 2 items and deliberately crash. Clicking it again will resume perfectly.")
-    
-    if st.button("Run Iteration (Click twice to prove resumability)", type="primary"):
-        run_script("uv run python assignment-3/agent.py")
+with tab1:
+    col1, col2 = st.columns([1, 2])
+    with col1:
+        st.markdown("### The Tool-Using Researcher")
+        st.write("An autonomous agent that plans its own sequence of actions. It is strictly constrained to a maximum of 6 tool calls to prevent infinite loops.")
+        st.write("**Architecture highlights:**")
+        st.markdown("""
+        - Dynamic Tool Binding
+        - Transparent LLM Reasoning Traces
+        - Explicit Fallback/Recovery mechanisms
+        """)
+        
+        st.divider()
+        if st.button("🚀 Run Standard Workflow", key="a1_clean", use_container_width=True, type="primary"):
+            run_agent_workflow("uv run python assignment-1/agent.py clean", "Research Agent (Standard)")
+            
+        if st.button("⚠️ Inject Mock Failure (Test Recovery)", key="a1_fail", use_container_width=True):
+            run_agent_workflow("uv run python assignment-1/agent.py fail", "Research Agent (Fault Tolerant)")
+
+    with col2:
+        st.info("👈 Click a button on the left to stream the agent's live reasoning trace.")
+
+with tab2:
+    col1, col2 = st.columns([1, 2])
+    with col1:
+        st.markdown("### The Worker / Reviewer Dyad")
+        st.write("A strictly linear multi-agent workflow. The Worker generates code, and the Reviewer evaluates it based on strict corporate guidelines.")
+        st.write("**Architecture highlights:**")
+        st.markdown("""
+        - Pydantic-enforced Structured Outputs
+        - Boolean verdicts with explainable reasoning
+        - Custom Token Tracker Callbacks
+        """)
+        
+        st.divider()
+        if st.button("✅ Run 'Approved' Scenario", key="a2_app", use_container_width=True, type="primary"):
+            run_agent_workflow("uv run python assignment-2/agent.py approve", "Multi-Agent Review (Approved)")
+            
+        if st.button("❌ Run 'Rejected' Scenario", key="a2_rej", use_container_width=True):
+            run_agent_workflow("uv run python assignment-2/agent.py reject", "Multi-Agent Review (Rejected)")
+
+    with col2:
+        st.info("👈 Click a button on the left to watch the Reviewer evaluate the Worker's output in real-time.")
+
+with tab3:
+    col1, col2 = st.columns([1, 2])
+    with col1:
+        st.markdown("### Resumable State Machine")
+        st.write("Demonstrates true persistence using LangGraph's SqliteSaver. The process will intentionally crash halfway through.")
+        st.write("**Architecture highlights:**")
+        st.markdown("""
+        - Disk-based SQLite Checkpointing
+        - Fault-tolerant pause and resume
+        - LLM-as-a-judge output validation
+        """)
+        
+        st.divider()
+        st.warning("Click the button below twice. The first click simulates a fatal crash. The second click resumes state perfectly.")
+        if st.button("🔄 Run Checkpointed Iteration", key="a3_run", use_container_width=True, type="primary"):
+            run_agent_workflow("uv run python assignment-3/agent.py", "Resumable Agent")
+
+    with col2:
+        st.info("👈 First click: Will crash on Item #3. Second click: Will skip items #1 and #2 and finish successfully.")
