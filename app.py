@@ -8,18 +8,30 @@ a1 = importlib.import_module("assignment-1.agent")
 a2 = importlib.import_module("assignment-2.agent")
 a3 = importlib.import_module("assignment-3.agent")
 
+import ast
+
 def run_a1(query):
     state = {"messages": [HumanMessage(content=query)], "tool_call_count": 0, "should_fail": False}
     result = a1.app.invoke(state)
     content = result["messages"][-1].content
-    if isinstance(content, list):
-        return content[0].get("text", "") if isinstance(content[0], dict) else str(content)
+    
+    # Handle stringified list output from Langchain/Gemini bug
+    if isinstance(content, str) and content.startswith("[{"):
+        try:
+            parsed = ast.literal_eval(content)
+            if isinstance(parsed, list) and len(parsed) > 0 and isinstance(parsed[0], dict):
+                content = parsed[0].get("text", content)
+        except:
+            pass
+    elif isinstance(content, list):
+        content = content[0].get("text", "") if isinstance(content[0], dict) else str(content)
+    
     return str(content)
 
 def run_a2():
-    state = {"task": "Write a python function that calculates the fibonacci sequence.", "worker_output": "", "reviewer_feedback": "", "is_approved": False, "loop_count": 0}
+    state = {"task": "Write a python function that calculates the fibonacci sequence.", "worker_output": "", "review_verdict": "", "review_reason": ""}
     result = a2.app.invoke(state)
-    return f"Verdict: {'APPROVED' if result['is_approved'] else 'REJECTED'}\n\nReviewer Feedback: {result['reviewer_feedback']}\n\nWorker Output:\n{result['worker_output']}"
+    return f"Verdict: {str(result.get('review_verdict', '')).upper()}\n\nReviewer Feedback: {result.get('review_reason', '')}\n\nWorker Output:\n{result.get('worker_output', '')}"
 
 def run_a3(crash_toggle):
     from langchain_core.runnables import RunnableConfig
