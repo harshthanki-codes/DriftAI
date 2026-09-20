@@ -54,7 +54,13 @@ def process_item(state: AgentState):
         prompt = f"Summarize this short text in one sentence: {item}"
         response = llm.invoke([HumanMessage(content=prompt)])
         calls += 1
-        summary = response.content.strip()
+        # Robustly handle if the model returns a list or a string
+        raw_content = response.content
+        if isinstance(raw_content, list):
+            # Extract text from the first item if it's a list of dictionaries
+            summary = raw_content[0].get("text", "").strip() if isinstance(raw_content[0], dict) else str(raw_content).strip()
+        else:
+            summary = raw_content.strip()
         
     results[f"item_{idx}"] = summary
     logger.info(f"Result saved: {summary}")

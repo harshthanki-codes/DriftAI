@@ -5,45 +5,15 @@ import os
 # --- Page Config & CSS ---
 st.set_page_config(page_title="Drift AI - Agent Fleet", page_icon="🚀", layout="wide")
 
-st.markdown("""
-<style>
-    /* Sleek Dark Mode Adjustments */
-    .stApp {
-        background-color: #0E1117;
-    }
-    .main-header {
-        font-size: 2.5rem;
-        font-weight: 800;
-        background: -webkit-linear-gradient(45deg, #FF4B2B, #FF416C);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin-bottom: 0rem;
-    }
-    .sub-header {
-        font-size: 1.2rem;
-        color: #888;
-        margin-bottom: 2rem;
-    }
-    .metric-card {
-        background-color: #1E1E1E;
-        padding: 15px;
-        border-radius: 10px;
-        border-left: 5px solid #FF416C;
-    }
-    /* Hide default Streamlit elements */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-</style>
-""", unsafe_allow_html=True)
+
 
 # --- Header ---
-st.markdown('<div class="main-header">🚀 Drift AI | Autonomous Agent Fleet</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-header">Production-Grade LangGraph Architectures • Pydantic Structured Outputs • SQLite Checkpointing</div>', unsafe_allow_html=True)
+st.title("🚀 Drift AI | Autonomous Agent Fleet")
+st.subheader("Production-Grade LangGraph Architectures • Pydantic Structured Outputs • SQLite Checkpointing")
 
 # --- Sidebar Telemetry ---
 with st.sidebar:
-    st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Python-logo-notext.svg/1200px-Python-logo-notext.svg.png", width=50)
-    st.markdown("### System Telemetry")
+    st.markdown("### ⚙️ System Telemetry")
     st.metric(label="Model Engine", value="Gemini 3.5 Flash")
     st.metric(label="Orchestration", value="LangGraph")
     st.metric(label="State Persistence", value="Active (SQLite)")
