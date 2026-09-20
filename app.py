@@ -1,135 +1,62 @@
-import streamlit as st
-import subprocess
-import os
+import gradio as gr
+import importlib
+from langchain_core.messages import HumanMessage
+import json
 
-# --- Page Config & CSS ---
-st.set_page_config(page_title="Drift AI - Agent Fleet", page_icon="🚀", layout="wide")
+# Import the agents
+a1 = importlib.import_module("assignment-1.agent")
+a2 = importlib.import_module("assignment-2.agent")
+a3 = importlib.import_module("assignment-3.agent")
 
+def run_a1(query):
+    state = {"messages": [HumanMessage(content=query)], "tool_call_count": 0, "should_fail": False}
+    result = a1.app.invoke(state)
+    content = result["messages"][-1].content
+    if isinstance(content, list):
+        return content[0].get("text", "") if isinstance(content[0], dict) else str(content)
+    return str(content)
 
+def run_a2():
+    state = {"task": "Write a python function that calculates the fibonacci sequence.", "worker_output": "", "reviewer_feedback": "", "is_approved": False, "loop_count": 0}
+    result = a2.app.invoke(state)
+    return f"Verdict: {'APPROVED' if result['is_approved'] else 'REJECTED'}\n\nReviewer Feedback: {result['reviewer_feedback']}\n\nWorker Output:\n{result['worker_output']}"
 
-# --- Header ---
-st.title("🚀 Drift AI | Autonomous Agent Fleet")
-st.subheader("Production-Grade LangGraph Architectures • Pydantic Structured Outputs • SQLite Checkpointing")
+def run_a3(crash_toggle):
+    from langchain_core.runnables import RunnableConfig
+    import time
+    config = RunnableConfig(configurable={"thread_id": f"gradio_session_{int(time.time())}"})
+    items = ["Company A reported a 20% increase in revenue.", "The new cloud division is profitable.", "CEO resigns abruptly.", "Stock prices plummet."]
+    state = {"items": items, "results": {}, "current_index": 0, "should_crash": crash_toggle}
+    try:
+        result = a3.app.invoke(state, config=config)
+        return json.dumps(result["results"], indent=2)
+    except SystemExit:
+        return f"CRASHED! The agent deliberately died at Item #3.\n\n(Uncheck 'Simulate Crash' and run again to watch it perfectly resume and finish without repeating the first two!)"
 
-# --- Sidebar Telemetry ---
-with st.sidebar:
-    st.markdown("### ⚙️ System Telemetry")
-    st.metric(label="Model Engine", value="Gemini 3.5 Flash")
-    st.metric(label="Orchestration", value="LangGraph")
-    st.metric(label="State Persistence", value="Active (SQLite)")
-    st.divider()
-    st.markdown("#### Built For Drift AI")
-    st.info("Demonstrates fault-tolerance, multi-agent cyclic reviews, and absolute deterministic output validation.")
+# Sleek UI Design
+with gr.Blocks(theme=gr.themes.Monochrome()) as demo:
+    gr.Markdown("<h1 style='text-align: center;'>🚀 Drift AI | Autonomous Agent Fleet</h1>")
+    gr.Markdown("<p style='text-align: center;'>Production-grade LangGraph architectures, now running on the industry-standard Gradio framework.</p>")
+    
+    with gr.Tab("Assignment 1: Research Agent"):
+        gr.Markdown("Agent that decides which tools to use with a strict 6-turn limit.")
+        a1_input = gr.Textbox(label="Ask the agent a question", value="What's the best caching strategy for a read-heavy API with 10k req/sec?")
+        a1_btn = gr.Button("Execute Research Agent", variant="primary")
+        a1_output = gr.Textbox(label="Agent Response", lines=10)
+        a1_btn.click(run_a1, inputs=a1_input, outputs=a1_output)
 
-# --- Execution Function ---
-def run_agent_workflow(command, title):
-    with st.container(border=True):
-        st.markdown(f"### 📡 Live Execution: {title}")
+    with gr.Tab("Assignment 2: Worker-Reviewer Dyad"):
+        gr.Markdown("Worker outputs code, Reviewer enforces strict validation via Pydantic.")
+        a2_btn = gr.Button("Execute Multi-Agent Dyad", variant="primary")
+        a2_output = gr.Textbox(label="Final Report", lines=10)
+        a2_btn.click(run_a2, inputs=[], outputs=a2_output)
         
-        progress_text = "Initializing LangGraph Nodes..."
-        my_bar = st.progress(0, text=progress_text)
-        
-        output_container = st.empty()
-        full_output = ""
-        
-        try:
-            my_bar.progress(20, text="Establishing Google GenAI Connection...")
-            process = subprocess.Popen(
-                command,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                text=True,
-                shell=True,
-                cwd=os.getcwd()
-            )
-            
-            my_bar.progress(50, text="Streaming LLM Reasoning Engine...")
-            for line in process.stdout:
-                full_output += line
-                # Render beautifully with syntax highlighting
-                output_container.code(full_output, language="yaml")
-                
-            process.wait()
-            
-            if process.returncode == 0 or process.returncode == 1:
-                my_bar.progress(100, text="Execution Complete.")
-                st.toast("Workflow executed successfully!", icon="✅")
-                if "WORKFLOW COMPLETE" in full_output:
-                    st.balloons()
-            else:
-                st.error(f"Execution failed with return code {process.returncode}")
-                
-        except Exception as e:
-            st.error(f"Execution Error: {str(e)}")
+    with gr.Tab("Assignment 3: Resumable Memory"):
+        gr.Markdown("SQLite checkpointing. If it crashes, it resumes exactly where it left off.")
+        a3_crash = gr.Checkbox(label="Simulate Crash on Item 3?", value=True)
+        a3_btn = gr.Button("Execute Processing Pipeline", variant="primary")
+        a3_output = gr.Code(label="Database Results", language="json")
+        a3_btn.click(run_a3, inputs=a3_crash, outputs=a3_output)
 
-
-# --- Main Application ---
-tab1, tab2, tab3 = st.tabs([
-    "🔍 Assignment 1: Research Agent", 
-    "⚖️ Assignment 2: Multi-Agent Review", 
-    "💾 Assignment 3: Resumable Memory"
-])
-
-with tab1:
-    col1, col2 = st.columns([1, 2])
-    with col1:
-        st.markdown("### The Tool-Using Researcher")
-        st.write("An autonomous agent that plans its own sequence of actions. It is strictly constrained to a maximum of 6 tool calls to prevent infinite loops.")
-        st.write("**Architecture highlights:**")
-        st.markdown("""
-        - Dynamic Tool Binding
-        - Transparent LLM Reasoning Traces
-        - Explicit Fallback/Recovery mechanisms
-        """)
-        
-        st.divider()
-        if st.button("🚀 Run Standard Workflow", key="a1_clean", use_container_width=True, type="primary"):
-            run_agent_workflow("uv run python assignment-1/agent.py clean", "Research Agent (Standard)")
-            
-        if st.button("⚠️ Inject Mock Failure (Test Recovery)", key="a1_fail", use_container_width=True):
-            run_agent_workflow("uv run python assignment-1/agent.py fail", "Research Agent (Fault Tolerant)")
-
-    with col2:
-        st.info("👈 Click a button on the left to stream the agent's live reasoning trace.")
-
-with tab2:
-    col1, col2 = st.columns([1, 2])
-    with col1:
-        st.markdown("### The Worker / Reviewer Dyad")
-        st.write("A strictly linear multi-agent workflow. The Worker generates code, and the Reviewer evaluates it based on strict corporate guidelines.")
-        st.write("**Architecture highlights:**")
-        st.markdown("""
-        - Pydantic-enforced Structured Outputs
-        - Boolean verdicts with explainable reasoning
-        - Custom Token Tracker Callbacks
-        """)
-        
-        st.divider()
-        if st.button("✅ Run 'Approved' Scenario", key="a2_app", use_container_width=True, type="primary"):
-            run_agent_workflow("uv run python assignment-2/agent.py approve", "Multi-Agent Review (Approved)")
-            
-        if st.button("❌ Run 'Rejected' Scenario", key="a2_rej", use_container_width=True):
-            run_agent_workflow("uv run python assignment-2/agent.py reject", "Multi-Agent Review (Rejected)")
-
-    with col2:
-        st.info("👈 Click a button on the left to watch the Reviewer evaluate the Worker's output in real-time.")
-
-with tab3:
-    col1, col2 = st.columns([1, 2])
-    with col1:
-        st.markdown("### Resumable State Machine")
-        st.write("Demonstrates true persistence using LangGraph's SqliteSaver. The process will intentionally crash halfway through.")
-        st.write("**Architecture highlights:**")
-        st.markdown("""
-        - Disk-based SQLite Checkpointing
-        - Fault-tolerant pause and resume
-        - LLM-as-a-judge output validation
-        """)
-        
-        st.divider()
-        st.warning("Click the button below twice. The first click simulates a fatal crash. The second click resumes state perfectly.")
-        if st.button("🔄 Run Checkpointed Iteration", key="a3_run", use_container_width=True, type="primary"):
-            run_agent_workflow("uv run python assignment-3/agent.py", "Resumable Agent")
-
-    with col2:
-        st.info("👈 First click: Will crash on Item #3. Second click: Will skip items #1 and #2 and finish successfully.")
+if __name__ == "__main__":
+    demo.launch(server_name="127.0.0.1", server_port=7860)
