@@ -12,3 +12,6 @@ This repository contains three production-grade AI agent assignments built using
 uv pip install -r requirements.txt
 uv run streamlit run app.py
 ```
+
+## Docker Support
+Run `docker-compose up` to start the fleet.
