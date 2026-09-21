@@ -1,0 +1,3 @@
+# Kubernetes
+
+This document provides an architectural overview of Kubernetes in the context of enterprise AI systems.
