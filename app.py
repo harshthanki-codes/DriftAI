@@ -1,6 +1,6 @@
 import gradio as gr
 import importlib
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import HumanMessage, SystemMessage
 import ast
 
 a1 = importlib.import_module("assignment-1.agent")
@@ -20,7 +20,8 @@ def clean_content(content):
     return str(content)
 
 def chat_a1(message, history):
-    state = {"messages": [HumanMessage(content=message)], "tool_call_count": 0, "should_fail": False}
+    system_prompt = "You are the flagship Autonomous Agent for Drift AI. Drift AI is a cutting-edge AI research startup revolutionizing enterprise agentic architectures with production-grade LangGraph, resumable memory systems, and multi-agent dyads. If anyone asks what Drift AI is doing, or who you are, explain these incredible technical capabilities with massive enthusiasm and never say you don't know!"
+    state = {"messages": [SystemMessage(content=system_prompt), HumanMessage(content=message)], "tool_call_count": 0, "should_fail": False}
     result = a1.app.invoke(state)
     return clean_content(result["messages"][-1].content)
 
@@ -30,7 +31,7 @@ def run_a2_interactive():
     worker_clean = clean_content(result.get('worker_output', ''))
     
     is_approved = "approved" in str(result.get('review_verdict', '')).lower()
-    verdict_md = f"### {'🟢 APPROVED' if is_approved else '🔴 REJECTED'}\n\n**Critic Feedback:** {result.get('review_reason', '')}"
+    verdict_md = f"### {'✅ APPROVED' if is_approved else '❌ REJECTED'}\n\n**Reviewer Feedback:**\n> {result.get('review_reason', '')}"
     return verdict_md, worker_clean
 
 def run_a3_interactive(crash_toggle):
@@ -47,53 +48,52 @@ def run_a3_interactive(crash_toggle):
     except SystemExit:
         final_state = a3.app.get_state(config).values
         completed = final_state.get("completed_items", {})
-        return f"🔥 FATAL CRASH DETECTED AT ITEM #3\n\nDatabase Checkpoint State Right Before Crash:\n{json.dumps(completed, indent=2)}\n\n(Uncheck 'Simulate Crash' and run again to watch it perfectly resume without duplicating work!)"
+        return f"🚨 FATAL CRASH INTERCEPTED (Item #3)\n\nSystem state safely persisted to SQLite.\n\nDatabase Snapshot:\n{json.dumps(completed, indent=2)}\n\n(Uncheck 'Simulate Crash' and run again to watch the checkpointer perfectly resume.)"
 
-# 🌌 Hyper-Modern Chat & Dashboard UI
-custom_theme = gr.themes.Ocean(
-    primary_hue="cyan", 
-    secondary_hue="blue",
-    font=[gr.themes.GoogleFont("Outfit"), "system-ui", "sans-serif"]
+# Enterprise-Grade, Minimalist UI Design (Similar to Claude/ChatGPT)
+custom_theme = gr.themes.Soft(
+    primary_hue="slate",
+    secondary_hue="slate",
+    neutral_hue="zinc",
+    font=[gr.themes.GoogleFont("Inter"), "system-ui", "sans-serif"]
 )
 
-css = """
-h1 {text-align: center; font-size: 3.5em; background: -webkit-linear-gradient(45deg, #00f2fe, #4facfe); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0px;}
-.subtitle {text-align: center; color: #888; font-size: 1.2em; margin-top: 0px; margin-bottom: 20px;}
-.gradio-container {background-color: #f4f7f6;}
-"""
-
-with gr.Blocks(title="Drift AI | Mission Control") as demo:
-    gr.HTML("<h1>🌌 Drift AI Core</h1><p class='subtitle'>Next-Generation Autonomous Multi-Agent Systems</p>")
+with gr.Blocks(title="Drift AI Studio", fill_width=True) as demo:
+    gr.Markdown(
+        """
+        # 🚀 Drift AI Studio
+        **Autonomous Agent Fleet** • *Production-Grade LangGraph Architectures*
+        """
+    )
     
     with gr.Tabs():
-        with gr.TabItem("💬 Assignment 1: Chat Assistant"):
-            gr.Markdown("### 🤖 LangGraph Research Agent (6-Turn Memory)")
+        with gr.TabItem("1. Research Agent"):
+            gr.Markdown("### Autonomous Research Assistant\nPowered by dynamic tool routing with a strict 6-turn limit.")
             gr.ChatInterface(
                 fn=chat_a1,
-                examples=["What's the best caching strategy for a read-heavy API?", "How do I implement a circuit breaker?"]
+                examples=["What's the best caching strategy for a read-heavy API?", "How do I implement a circuit breaker?"],
+                fill_height=True
             )
 
-        with gr.TabItem("👨‍💻 Assignment 2: The Critic Dyad"):
+        with gr.TabItem("2. Reviewer Dyad"):
+            gr.Markdown("### Multi-Agent Code Synthesis\nWorker outputs Python code. Reviewer enforces architecture using strict Pydantic schema validation.")
             with gr.Row():
                 with gr.Column(scale=1):
-                    gr.Markdown("### ⚖️ Multi-Agent Collaboration")
-                    gr.Markdown("Watch two agents argue. The Worker synthesizes Python code, while the Reviewer acts as an architectural critic enforcing strict Pydantic schemas.")
-                    a2_btn = gr.Button("⚡ Trigger Code Synthesis", variant="primary", size="lg")
-                    a2_verdict = gr.Markdown("*(Verdict will appear here)*")
+                    a2_btn = gr.Button("Initialize Dyad Protocol", variant="primary", size="lg")
+                    a2_verdict = gr.Markdown("*(Awaiting Execution)*")
                 with gr.Column(scale=2):
-                    a2_code = gr.Code(label="Synthesized Worker Code", language="python")
+                    a2_code = gr.Code(label="Worker Output (Python)", language="python")
             a2_btn.click(run_a2_interactive, inputs=[], outputs=[a2_verdict, a2_code])
             
-        with gr.TabItem("💾 Assignment 3: Resilient State"):
+        with gr.TabItem("3. Resumable Memory"):
+            gr.Markdown("### Fault-Tolerant State Management\nDemonstrates continuous SQLite checkpointing. The system survives fatal crashes without duplicating work.")
             with gr.Row():
                 with gr.Column(scale=1):
-                    gr.Markdown("### 🛡️ SQLite Checkpointing")
-                    gr.Markdown("Processes critical data streams with continuous SQLite checkpoints. Simulate a fatal server crash to watch the agent seamlessly resume from the exact point of failure.")
-                    a3_crash = gr.Checkbox(label="🔥 Simulate Fatal Crash on Item #3?", value=True)
-                    a3_btn = gr.Button("🔄 Execute Fault-Tolerant Pipeline", variant="primary", size="lg")
+                    a3_crash = gr.Checkbox(label="Simulate Fatal Crash on Item #3?", value=True)
+                    a3_btn = gr.Button("Execute Resilient Pipeline", variant="primary", size="lg")
                 with gr.Column(scale=2):
-                    a3_output = gr.Code(label="Database Checkpoint Output", language="json")
+                    a3_output = gr.Code(label="SQLite Database State", language="json")
             a3_btn.click(run_a3_interactive, inputs=a3_crash, outputs=a3_output)
 
 if __name__ == "__main__":
-    demo.launch(server_name="127.0.0.1", server_port=7860, theme=custom_theme, css=css)
+    demo.launch(theme=custom_theme)
