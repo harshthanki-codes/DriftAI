@@ -1,5 +1,17 @@
 state.db
+state.db-shm
+state.db-wal
 .venv/
 __pycache__/
 .env
 .pytest_cache/
+*.pyc
+.chainlit/
+.files/
+.resumed
+make_commits.py
+make_50_commits.py
+make_50_more_commits.py
+test_models.py
+test_quota.py
+uv.lock

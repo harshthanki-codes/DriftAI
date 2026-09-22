@@ -1,12 +1,15 @@
 [project]
 name = "drift-ai-agents"
-version = "0.1.0"
-description = "Production-grade autonomous AI agents"
+version = "1.0.0"
+description = "Production-grade autonomous AI agents built with LangGraph"
 authors = [{name = "Harsh Thanki"}]
+requires-python = ">=3.12"
 dependencies = [
-    "langchain",
-    "langgraph",
-    "langchain-google-genai",
-    "streamlit",
-    "pydantic"
+    "langchain>=0.3",
+    "langgraph>=0.2",
+    "langchain-google-genai>=2.0",
+    "langgraph-checkpoint-sqlite>=2.0",
+    "gradio>=5.0",
+    "pydantic>=2.0",
+    "python-dotenv>=1.0",
 ]
