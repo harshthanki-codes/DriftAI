@@ -1,14 +1,11 @@
 import gradio as gr
 import importlib
 from langchain_core.messages import HumanMessage
-import json
+import ast
 
-# Import the agents
 a1 = importlib.import_module("assignment-1.agent")
 a2 = importlib.import_module("assignment-2.agent")
 a3 = importlib.import_module("assignment-3.agent")
-
-import ast
 
 def clean_content(content):
     if isinstance(content, str) and content.startswith("[{"):
@@ -22,89 +19,81 @@ def clean_content(content):
         return content[0].get("text", "") if isinstance(content[0], dict) else str(content)
     return str(content)
 
-def run_a1(query):
-    state = {"messages": [HumanMessage(content=query)], "tool_call_count": 0, "should_fail": False}
+def chat_a1(message, history):
+    state = {"messages": [HumanMessage(content=message)], "tool_call_count": 0, "should_fail": False}
     result = a1.app.invoke(state)
     return clean_content(result["messages"][-1].content)
 
-def run_a2():
+def run_a2_interactive():
     state = {"task": "Write a python function that calculates the fibonacci sequence.", "worker_output": "", "review_verdict": "", "review_reason": ""}
     result = a2.app.invoke(state)
     worker_clean = clean_content(result.get('worker_output', ''))
-    return f"Verdict: {str(result.get('review_verdict', '')).upper()}\n\nReviewer Feedback: {result.get('review_reason', '')}\n\nWorker Output:\n{worker_clean}"
+    
+    is_approved = "approved" in str(result.get('review_verdict', '')).lower()
+    verdict_md = f"### {'🟢 APPROVED' if is_approved else '🔴 REJECTED'}\n\n**Critic Feedback:** {result.get('review_reason', '')}"
+    return verdict_md, worker_clean
 
-def run_a3(crash_toggle):
+def run_a3_interactive(crash_toggle):
     from langchain_core.runnables import RunnableConfig
-    import time
-    config = RunnableConfig(configurable={"thread_id": f"gradio_session_{int(time.time())}"})
-    items = ["Company A reported a 20% increase in revenue.", "The new cloud division is profitable.", "CEO resigns abruptly.", "Stock prices plummet."]
-    state = {"items": items, "results": {}, "current_index": 0, "should_crash": crash_toggle}
+    config = RunnableConfig(configurable={"thread_id": "test_session_1", "crash_at_item_3": crash_toggle})
+    
+    import json
     try:
-        result = a3.app.invoke(state, config=config)
-        return json.dumps(result["results"], indent=2)
+        a3.app.invoke({"items": ["Company A experienced a 20% revenue growth.", "The new cloud division is profitable.", "Stock prices drop sharply."]}, config=config)
+        
+        final_state = a3.app.get_state(config).values
+        completed = final_state.get("completed_items", {})
+        return json.dumps(completed, indent=2)
     except SystemExit:
-        return f"CRASHED! The agent deliberately died at Item #3.\n\n(Uncheck 'Simulate Crash' and run again to watch it perfectly resume and finish without repeating the first two!)"
+        final_state = a3.app.get_state(config).values
+        completed = final_state.get("completed_items", {})
+        return f"🔥 FATAL CRASH DETECTED AT ITEM #3\n\nDatabase Checkpoint State Right Before Crash:\n{json.dumps(completed, indent=2)}\n\n(Uncheck 'Simulate Crash' and run again to watch it perfectly resume without duplicating work!)"
 
-# 🌌 Sleek Mission Control UI Design
-custom_theme = gr.themes.Soft(
-    primary_hue="indigo", 
+# 🌌 Hyper-Modern Chat & Dashboard UI
+custom_theme = gr.themes.Ocean(
+    primary_hue="cyan", 
     secondary_hue="blue",
-    font=[gr.themes.GoogleFont("Inter"), "system-ui", "sans-serif"]
+    font=[gr.themes.GoogleFont("Outfit"), "system-ui", "sans-serif"]
 )
 
+css = """
+h1 {text-align: center; font-size: 3.5em; background: -webkit-linear-gradient(45deg, #00f2fe, #4facfe); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0px;}
+.subtitle {text-align: center; color: #888; font-size: 1.2em; margin-top: 0px; margin-bottom: 20px;}
+.gradio-container {background-color: #f4f7f6;}
+"""
+
 with gr.Blocks(title="Drift AI | Mission Control") as demo:
-    with gr.Row():
-        gr.Markdown(
-            """
-            <div style='text-align: center; padding: 2rem 0;'>
-                <h1 style='font-size: 3em; margin-bottom: 0.2em; font-weight: 800;'>🌌 Drift AI | Mission Control</h1>
-                <p style='font-size: 1.2em; color: #666;'>Enterprise-Grade LangGraph Architectures • Resilient State Management • Multi-Agent Dyads</p>
-            </div>
-            """
-        )
+    gr.HTML("<h1>🌌 Drift AI Core</h1><p class='subtitle'>Next-Generation Autonomous Multi-Agent Systems</p>")
     
     with gr.Tabs():
-        with gr.TabItem("🔍 Assignment 1: Research Agent"):
-            with gr.Row():
-                with gr.Column(scale=1):
-                    gr.Markdown("### 🧠 Autonomous Decision Engine")
-                    gr.Markdown("This agent dynamically selects tools to solve complex queries. It features a strict **6-turn safety limit** and API fallback mechanisms to ensure 100% uptime.")
-                    a1_input = gr.Textbox(label="Query Input", placeholder="E.g., What's the best caching strategy for a read-heavy API...", lines=3)
-                    a1_btn = gr.Button("🚀 Deploy Research Agent", variant="primary", size="lg")
-                with gr.Column(scale=2):
-                    a1_output = gr.Textbox(label="Agent Intelligence Output", lines=12)
-            a1_btn.click(run_a1, inputs=a1_input, outputs=a1_output)
+        with gr.TabItem("💬 Assignment 1: Chat Assistant"):
+            gr.Markdown("### 🤖 LangGraph Research Agent (6-Turn Memory)")
+            gr.ChatInterface(
+                fn=chat_a1,
+                examples=["What's the best caching strategy for a read-heavy API?", "How do I implement a circuit breaker?"]
+            )
 
-        with gr.TabItem("⚖️ Assignment 2: Reviewer Dyad"):
+        with gr.TabItem("👨‍💻 Assignment 2: The Critic Dyad"):
             with gr.Row():
                 with gr.Column(scale=1):
-                    gr.Markdown("### 👨‍💻 Multi-Agent Collaboration")
-                    gr.Markdown("A two-agent system. The **Worker** synthesizes Python code, and the **Reviewer** rigidly enforces architecture standards using deterministic Pydantic schema validation.")
-                    a2_btn = gr.Button("⚡ Execute Dyad Pipeline", variant="primary", size="lg")
+                    gr.Markdown("### ⚖️ Multi-Agent Collaboration")
+                    gr.Markdown("Watch two agents argue. The Worker synthesizes Python code, while the Reviewer acts as an architectural critic enforcing strict Pydantic schemas.")
+                    a2_btn = gr.Button("⚡ Trigger Code Synthesis", variant="primary", size="lg")
+                    a2_verdict = gr.Markdown("*(Verdict will appear here)*")
                 with gr.Column(scale=2):
-                    a2_output = gr.Textbox(label="Final Quality Assurance Report", lines=12)
-            a2_btn.click(run_a2, inputs=[], outputs=a2_output)
+                    a2_code = gr.Code(label="Synthesized Worker Code", language="python")
+            a2_btn.click(run_a2_interactive, inputs=[], outputs=[a2_verdict, a2_code])
             
-        with gr.TabItem("💾 Assignment 3: Resumable Memory"):
+        with gr.TabItem("💾 Assignment 3: Resilient State"):
             with gr.Row():
                 with gr.Column(scale=1):
-                    gr.Markdown("### 🛡️ Fault-Tolerant State Management")
-                    gr.Markdown("Processes critical data streams with continuous SQLite checkpointing. If a fatal crash occurs, the LangGraph architecture seamlessly resumes from the exact point of failure.")
+                    gr.Markdown("### 🛡️ SQLite Checkpointing")
+                    gr.Markdown("Processes critical data streams with continuous SQLite checkpoints. Simulate a fatal server crash to watch the agent seamlessly resume from the exact point of failure.")
                     a3_crash = gr.Checkbox(label="🔥 Simulate Fatal Crash on Item #3?", value=True)
-                    a3_btn = gr.Button("🔄 Run Fault-Tolerant Pipeline", variant="primary", size="lg")
+                    a3_btn = gr.Button("🔄 Execute Fault-Tolerant Pipeline", variant="primary", size="lg")
                 with gr.Column(scale=2):
-                    a3_output = gr.Code(label="SQLite Checkpoint Data", language="json")
-            a3_btn.click(run_a3, inputs=a3_crash, outputs=a3_output)
-            
-    with gr.Accordion("System Architecture Details", open=False):
-        gr.Markdown(
-            """
-            - **Framework**: LangGraph + Gradio
-            - **LLM Engine**: Google Gemini 3.5 Flash Lite (Multi-Key Failover Enabled)
-            - **State Persister**: SQLite (`SqliteSaver`)
-            - **Validation**: Pydantic `BaseModel` Constraints
-            """
-        )
+                    a3_output = gr.Code(label="Database Checkpoint Output", language="json")
+            a3_btn.click(run_a3_interactive, inputs=a3_crash, outputs=a3_output)
 
 if __name__ == "__main__":
-    demo.launch(server_name="127.0.0.1", server_port=7860, theme=custom_theme)
+    demo.launch(server_name="127.0.0.1", server_port=7860, theme=custom_theme, css=css)
