@@ -101,7 +101,7 @@ body, .gradio-container { background-color: #050505 !important; }
 }
 """
 
-with gr.Blocks(title="Drift AI Next-Gen", theme=custom_theme, css=css) as demo:
+with gr.Blocks(title="Drift AI Next-Gen") as demo:
     gr.HTML("<h1 class='glow-header'>DRIFT AI</h1><div class='sub-header'>Quantum-Grade Autonomous Agents</div>")
     
     with gr.Tabs(elem_classes="glass"):
@@ -133,4 +133,4 @@ with gr.Blocks(title="Drift AI Next-Gen", theme=custom_theme, css=css) as demo:
             a3_btn.click(run_a3_interactive, inputs=a3_crash, outputs=a3_output)
 
 if __name__ == "__main__":
-    demo.launch()
+    demo.launch(theme=custom_theme, css=css)
