@@ -50,50 +50,87 @@ def run_a3_interactive(crash_toggle):
         completed = final_state.get("completed_items", {})
         return f"🚨 FATAL CRASH INTERCEPTED (Item #3)\n\nSystem state safely persisted to SQLite.\n\nDatabase Snapshot:\n{json.dumps(completed, indent=2)}\n\n(Uncheck 'Simulate Crash' and run again to watch the checkpointer perfectly resume.)"
 
-# Enterprise-Grade, Minimalist UI Design (Similar to Claude/ChatGPT)
-custom_theme = gr.themes.Soft(
-    primary_hue="slate",
-    secondary_hue="slate",
-    neutral_hue="zinc",
-    font=[gr.themes.GoogleFont("Inter"), "system-ui", "sans-serif"]
+# 🔥 Ultimate "Never Before Seen" UI Design
+custom_theme = gr.themes.Monochrome(
+    font=[gr.themes.GoogleFont("Space Grotesk"), "system-ui", "sans-serif"],
+    primary_hue="emerald",
+    secondary_hue="blue",
+    neutral_hue="zinc"
 )
 
-with gr.Blocks(title="Drift AI Studio", fill_width=True) as demo:
-    gr.Markdown(
-        """
-        # 🚀 Drift AI Studio
-        **Autonomous Agent Fleet** • *Production-Grade LangGraph Architectures*
-        """
-    )
+css = """
+body, .gradio-container { background-color: #050505 !important; }
+.glow-header { 
+    text-align: center; 
+    font-size: 4.5rem; 
+    font-weight: 900; 
+    background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%); 
+    -webkit-background-clip: text; 
+    -webkit-text-fill-color: transparent; 
+    margin: 0; 
+    padding-top: 30px; 
+    letter-spacing: -2px; 
+}
+.sub-header { 
+    text-align: center; 
+    color: #a1a1aa; 
+    font-size: 1.1rem; 
+    font-weight: 400; 
+    letter-spacing: 4px; 
+    text-transform: uppercase; 
+    margin-bottom: 40px; 
+}
+.glass { 
+    background: rgba(255,255,255,0.02) !important; 
+    border: 1px solid rgba(255,255,255,0.05) !important; 
+    border-radius: 16px !important; 
+    box-shadow: 0 8px 32px 0 rgba(0,0,0,0.3) !important; 
+    backdrop-filter: blur(12px) !important; 
+}
+.gradio-button.primary {
+    background: linear-gradient(90deg, #00C9FF 0%, #92FE9D 100%) !important;
+    color: #000 !important;
+    font-weight: bold !important;
+    border: none !important;
+    box-shadow: 0 4px 15px rgba(0, 201, 255, 0.4) !important;
+    transition: transform 0.2s, box-shadow 0.2s !important;
+}
+.gradio-button.primary:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(0, 201, 255, 0.6) !important;
+}
+"""
+
+with gr.Blocks(title="Drift AI Next-Gen", theme=custom_theme, css=css) as demo:
+    gr.HTML("<h1 class='glow-header'>DRIFT AI</h1><div class='sub-header'>Quantum-Grade Autonomous Agents</div>")
     
-    with gr.Tabs():
-        with gr.TabItem("1. Research Agent"):
-            gr.Markdown("### Autonomous Research Assistant\nPowered by dynamic tool routing with a strict 6-turn limit.")
+    with gr.Tabs(elem_classes="glass"):
+        with gr.TabItem("📡 Core 1: Neural Researcher"):
             gr.ChatInterface(
                 fn=chat_a1,
                 examples=["What's the best caching strategy for a read-heavy API?", "How do I implement a circuit breaker?"],
                 fill_height=True
             )
 
-        with gr.TabItem("2. Reviewer Dyad"):
-            gr.Markdown("### Multi-Agent Code Synthesis\nWorker outputs Python code. Reviewer enforces architecture using strict Pydantic schema validation.")
-            with gr.Row():
+        with gr.TabItem("🧠 Core 2: Architect Dyad"):
+            with gr.Row(elem_classes="glass", variant="panel"):
                 with gr.Column(scale=1):
-                    a2_btn = gr.Button("Initialize Dyad Protocol", variant="primary", size="lg")
+                    gr.Markdown("### 👨‍💻 Adversarial Synthesis\nWatch two agents debate. The Worker writes Python, the Critic enforces strict architectural schemas.")
+                    a2_btn = gr.Button("⚡ Initialize Neural Dyad", variant="primary", size="lg")
                     a2_verdict = gr.Markdown("*(Awaiting Execution)*")
                 with gr.Column(scale=2):
-                    a2_code = gr.Code(label="Worker Output (Python)", language="python")
+                    a2_code = gr.Code(label="Synthesized Architecture (Python)", language="python")
             a2_btn.click(run_a2_interactive, inputs=[], outputs=[a2_verdict, a2_code])
             
-        with gr.TabItem("3. Resumable Memory"):
-            gr.Markdown("### Fault-Tolerant State Management\nDemonstrates continuous SQLite checkpointing. The system survives fatal crashes without duplicating work.")
-            with gr.Row():
+        with gr.TabItem("💾 Core 3: Quantum Memory"):
+            with gr.Row(elem_classes="glass", variant="panel"):
                 with gr.Column(scale=1):
-                    a3_crash = gr.Checkbox(label="Simulate Fatal Crash on Item #3?", value=True)
-                    a3_btn = gr.Button("Execute Resilient Pipeline", variant="primary", size="lg")
+                    gr.Markdown("### 🛡️ Indestructible Checkpointing\nProcesses data with SQLite checkpoints. Survives terminal crashes without losing state.")
+                    a3_crash = gr.Checkbox(label="🔥 Simulate Kernel Panic (Crash at #3)?", value=True)
+                    a3_btn = gr.Button("🔄 Execute Resilient Pipeline", variant="primary", size="lg")
                 with gr.Column(scale=2):
-                    a3_output = gr.Code(label="SQLite Database State", language="json")
+                    a3_output = gr.Code(label="SQLite State Manifold", language="json")
             a3_btn.click(run_a3_interactive, inputs=a3_crash, outputs=a3_output)
 
 if __name__ == "__main__":
-    demo.launch(theme=custom_theme)
+    demo.launch()
