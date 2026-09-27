@@ -50,59 +50,142 @@ def run_a3_interactive(crash_toggle):
         completed = final_state.get("completed_items", {})
         return f"🚨 FATAL CRASH INTERCEPTED (Item #3)\n\nSystem state safely persisted to SQLite.\n\nDatabase Snapshot:\n{json.dumps(completed, indent=2)}\n\n(Uncheck 'Simulate Crash' and run again to watch the checkpointer perfectly resume.)"
 
-# 🔥 Ultimate "Never Before Seen" UI Design
-custom_theme = gr.themes.Monochrome(
-    font=[gr.themes.GoogleFont("Space Grotesk"), "system-ui", "sans-serif"],
-    primary_hue="emerald",
-    secondary_hue="blue",
-    neutral_hue="zinc"
+# 🔥 Modern Interactive "Orange & White" UI Design
+custom_theme = gr.themes.Default(
+    font=[gr.themes.GoogleFont("Inter"), "ui-sans-serif", "sans-serif"],
+    primary_hue="orange",
+    secondary_hue="amber",
+    neutral_hue="slate"
 )
 
 css = """
-body, .gradio-container { background-color: #050505 !important; }
+/* Force light mode globally by overriding Gradio's internal CSS variables */
+:root, .dark, body, .gradio-container {
+    --background-fill-primary: #ffffff !important;
+    --background-fill-secondary: #fff7ed !important;
+    --border-color-primary: rgba(249, 115, 22, 0.2) !important;
+    --block-background-fill: rgba(255, 255, 255, 0.8) !important;
+    --block-border-color: rgba(249, 115, 22, 0.2) !important;
+    --panel-background-fill: #ffffff !important;
+    --body-text-color: #1e293b !important;
+    --body-text-color-subdued: #64748b !important;
+    --input-background-fill: #ffffff !important;
+    --input-border-color: rgba(249, 115, 22, 0.3) !important;
+}
+
+@keyframes gradient-bg {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+body, .gradio-container { 
+    background: linear-gradient(-45deg, #ffffff, #fff7ed, #ffedd5, #ffffff) !important;
+    background-size: 400% 400% !important;
+    animation: gradient-bg 15s ease infinite !important;
+    color: #1e293b !important;
+}
+
+/* Aggressively destroy all Gradio default top spacing */
+.gradio-container, .gradio-container > .main, .gradio-container > .main > .wrap, .wrap, .contain {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+
 .glow-header { 
     text-align: center; 
-    font-size: 4.5rem; 
+    font-size: 5rem; 
     font-weight: 900; 
-    background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%); 
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 50%, #f59e0b 100%); 
     -webkit-background-clip: text; 
     -webkit-text-fill-color: transparent; 
-    margin: 0; 
-    padding-top: 30px; 
-    letter-spacing: -2px; 
+    margin: 0 !important; 
+    padding-top: 0 !important;
+    line-height: 1.1;
+    letter-spacing: -3px; 
+    text-shadow: 0 10px 30px rgba(249, 115, 22, 0.2);
 }
+
 .sub-header { 
     text-align: center; 
-    color: #a1a1aa; 
-    font-size: 1.1rem; 
-    font-weight: 400; 
-    letter-spacing: 4px; 
+    color: #64748b; 
+    font-size: 1.2rem; 
+    font-weight: 600; 
+    letter-spacing: 6px; 
     text-transform: uppercase; 
-    margin-bottom: 40px; 
+    margin-top: 5px !important;
+    margin-bottom: 10px !important; 
 }
-.glass { 
-    background: rgba(255,255,255,0.02) !important; 
-    border: 1px solid rgba(255,255,255,0.05) !important; 
-    border-radius: 16px !important; 
-    box-shadow: 0 8px 32px 0 rgba(0,0,0,0.3) !important; 
-    backdrop-filter: blur(12px) !important; 
+
+/* Chatbot Specific Styling */
+.chatbot {
+    background-color: #ffffff !important;
+    border-radius: 20px !important;
+    box-shadow: 0 10px 30px rgba(249, 115, 22, 0.08) !important;
+    border: 1px solid rgba(249, 115, 22, 0.2) !important;
 }
-.gradio-button.primary {
-    background: linear-gradient(90deg, #00C9FF 0%, #92FE9D 100%) !important;
-    color: #000 !important;
-    font-weight: bold !important;
+
+/* User Message Bubble */
+.message-wrap .message.user {
+    background: linear-gradient(90deg, #f97316 0%, #ea580c 100%) !important;
+    color: #ffffff !important;
+    border-radius: 20px 20px 4px 20px !important;
+    box-shadow: 0 4px 15px rgba(249, 115, 22, 0.2) !important;
     border: none !important;
-    box-shadow: 0 4px 15px rgba(0, 201, 255, 0.4) !important;
-    transition: transform 0.2s, box-shadow 0.2s !important;
 }
+
+/* AI Message Bubble */
+.message-wrap .message.bot {
+    background: #fff7ed !important;
+    color: #1e293b !important;
+    border: 1px solid rgba(249, 115, 22, 0.2) !important;
+    border-radius: 20px 20px 20px 4px !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03) !important;
+}
+
+/* Input Area */
+textarea {
+    background-color: #ffffff !important;
+    color: #1e293b !important;
+    border: 1px solid rgba(249, 115, 22, 0.3) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.02) !important;
+}
+textarea:focus {
+    border-color: #f97316 !important;
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15) !important;
+}
+
+/* General Layout Elements */
+.glass { 
+    background: rgba(255, 255, 255, 0.8) !important; 
+    border: 1px solid rgba(249, 115, 22, 0.1) !important; 
+    border-radius: 24px !important; 
+    box-shadow: 0 20px 40px 0 rgba(0, 0, 0, 0.05), 0 1px 3px 0 rgba(249, 115, 22, 0.1) !important; 
+    backdrop-filter: blur(20px) !important; 
+    -webkit-backdrop-filter: blur(20px) !important;
+    overflow: hidden;
+}
+
+.gradio-button.primary {
+    background: linear-gradient(90deg, #f97316 0%, #ea580c 100%) !important;
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    border: none !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 20px rgba(249, 115, 22, 0.3) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
 .gradio-button.primary:hover {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 6px 20px rgba(0, 201, 255, 0.6) !important;
+    transform: translateY(-3px) scale(1.02) !important;
+    box-shadow: 0 12px 30px rgba(234, 88, 12, 0.4) !important;
 }
 """
 
-with gr.Blocks(title="Drift AI Next-Gen") as demo:
-    gr.HTML("<h1 class='glow-header'>DRIFT AI</h1><div class='sub-header'>Quantum-Grade Autonomous Agents</div>")
+with gr.Blocks(title="Drift AI Nexus", theme=custom_theme, css=css) as demo:
+    gr.HTML("<h1 class='glow-header'>DRIFT AI</h1><div class='sub-header'>Neural Interface Nexus</div>")
     
     with gr.Tabs(elem_classes="glass"):
         with gr.TabItem("📡 Core 1: Neural Researcher"):
@@ -133,4 +216,4 @@ with gr.Blocks(title="Drift AI Next-Gen") as demo:
             a3_btn.click(run_a3_interactive, inputs=a3_crash, outputs=a3_output)
 
 if __name__ == "__main__":
-    demo.launch(theme=custom_theme, css=css)
+    demo.launch()
