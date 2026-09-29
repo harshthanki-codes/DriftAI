@@ -164,6 +164,32 @@ textarea:focus {
     backdrop-filter: blur(20px) !important; 
     -webkit-backdrop-filter: blur(20px) !important;
     overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* 🚀 NEW INTERACTIVE ANIMATIONS */
+.glass:hover {
+    transform: translateY(-4px) scale(1.005) !important;
+    box-shadow: 0 30px 60px 0 rgba(0, 0, 0, 0.08), 0 4px 12px 0 rgba(249, 115, 22, 0.2) !important;
+    border: 1px solid rgba(249, 115, 22, 0.3) !important;
+}
+
+@keyframes pulse-glow {
+    0% { text-shadow: 0 10px 30px rgba(249, 115, 22, 0.2); }
+    50% { text-shadow: 0 10px 60px rgba(249, 115, 22, 0.8); }
+    100% { text-shadow: 0 10px 30px rgba(249, 115, 22, 0.2); }
+}
+
+.glow-header {
+    animation: pulse-glow 3s infinite !important;
+}
+
+.tab-nav button {
+    transition: all 0.3s ease !important;
+}
+.tab-nav button:hover {
+    color: #ea580c !important;
+    transform: translateY(-2px) !important;
 }
 
 .gradio-button.primary {
