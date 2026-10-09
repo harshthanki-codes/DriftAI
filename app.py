@@ -177,14 +177,29 @@ textarea:focus {
     border: 1px solid rgba(249, 115, 22, 0.3) !important;
 }
 
-@keyframes pulse-glow {
-    0% { text-shadow: 0 10px 30px rgba(249, 115, 22, 0.2); }
-    50% { text-shadow: 0 10px 60px rgba(249, 115, 22, 0.8); }
-    100% { text-shadow: 0 10px 30px rgba(249, 115, 22, 0.2); }
+/* Animated Shimmering Header */
+.glow-header {
+    background: linear-gradient(to right, #ea580c, #f97316, #fbbf24, #ea580c) !important;
+    background-size: 300% auto !important;
+    color: transparent !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    animation: shimmer 4s linear infinite !important;
+    text-shadow: none !important;
+}
+@keyframes shimmer {
+    to { background-position: 300% center; }
 }
 
-.glow-header {
-    animation: pulse-glow 3s infinite !important;
+/* Glowing Neon Inputs */
+textarea, input {
+    transition: all 0.3s ease !important;
+    border: 2px solid transparent !important;
+}
+textarea:focus, input:focus {
+    border-color: #f97316 !important;
+    box-shadow: 0 0 15px rgba(249, 115, 22, 0.4), inset 0 0 10px rgba(249, 115, 22, 0.1) !important;
+    transform: scale(1.01) !important;
 }
 
 .tab-nav button {
@@ -195,20 +210,28 @@ textarea:focus {
     transform: translateY(-2px) !important;
 }
 
+/* Pulsing animated buttons */
 .gradio-button.primary {
-    background: linear-gradient(90deg, #f97316 0%, #ea580c 100%) !important;
-    color: #ffffff !important;
-    font-weight: 800 !important;
+    background: linear-gradient(45deg, #ea580c, #f97316, #fbbf24, #ea580c) !important;
+    background-size: 300% 300% !important;
+    animation: gradient-shift 3s ease infinite !important;
+    color: white !important;
     border: none !important;
+    font-weight: 800 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
     border-radius: 12px !important;
-    box-shadow: 0 8px 20px rgba(249, 115, 22, 0.3) !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    transition: all 0.2s ease !important;
 }
-
 .gradio-button.primary:hover {
-    transform: translateY(-3px) scale(1.02) !important;
+    transform: scale(1.05) translateY(-2px) !important;
+    box-shadow: 0 10px 20px rgba(249, 115, 22, 0.4) !important;
+}
+@keyframes gradient-shift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
     box-shadow: 0 12px 30px rgba(234, 88, 12, 0.4) !important;
 }
 """
