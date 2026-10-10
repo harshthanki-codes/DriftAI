@@ -79,27 +79,21 @@ body, .gradio-container {
     background-image: none !important;
     color: #ededed !important;
     margin: 0 !important;
-    padding: 0 !important;
-    height: 100vh !important;
-    overflow: hidden !important;
-    display: flex !important;
-    flex-direction: column !important;
+    padding: 20px !important;
+    min-height: 100vh !important;
 }
 
-/* Aggressively destroy all Gradio default top spacing */
-.gradio-container, .gradio-container > .main, .gradio-container > .main > .wrap, .wrap, .contain {
-    padding: 0 !important;
-    margin: 0 !important;
-    flex: 1 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    overflow: hidden !important;
+/* Ensure container has some breathing room */
+.gradio-container {
+    max-width: 1200px !important;
+    margin: 0 auto !important;
 }
 
-/* Make Chatbot flex to fit exactly */
+/* Make Chatbot compact so everything fits on one screen naturally */
 .chatbot {
-    flex-grow: 1 !important;
-    min-height: 0 !important;
+    height: 40vh !important;
+    max-height: 500px !important;
+    overflow-y: auto !important;
 }
 
 /* Sleek Minimal Header */
@@ -230,8 +224,7 @@ with gr.Blocks(title="Synapse AI Nexus") as demo:
                 examples=[
                     ["What's the best caching strategy for a read-heavy API?", "Standard Assistant"], 
                     ["How do I implement a circuit breaker?", "Standard Assistant"]
-                ],
-                fill_height=True
+                ]
             )
 
         with gr.TabItem("🧠 Core 2: Architect Dyad"):
