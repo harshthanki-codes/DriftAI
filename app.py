@@ -50,12 +50,11 @@ def run_a3_interactive(crash_toggle):
         completed = final_state.get("completed_items", {})
         return f"🚨 FATAL CRASH INTERCEPTED (Item #3)\n\nSystem state safely persisted to SQLite.\n\nDatabase Snapshot:\n{json.dumps(completed, indent=2)}\n\n(Uncheck 'Simulate Crash' and run again to watch the checkpointer perfectly resume.)"
 
-# 🔥 Modern Interactive "Orange & White" UI Design
-custom_theme = gr.themes.Default(
+custom_theme = gr.themes.Monochrome(
     font=[gr.themes.GoogleFont("Inter"), "ui-sans-serif", "sans-serif"],
-    primary_hue="orange",
-    secondary_hue="amber",
-    neutral_hue="slate"
+    primary_hue="neutral",
+    secondary_hue="neutral",
+    neutral_hue="neutral"
 )
 
 css = """
@@ -79,12 +78,28 @@ body, .gradio-container {
     background-color: #000000 !important;
     background-image: none !important;
     color: #ededed !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: 100vh !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
 }
 
 /* Aggressively destroy all Gradio default top spacing */
 .gradio-container, .gradio-container > .main, .gradio-container > .main > .wrap, .wrap, .contain {
-    padding-top: 0 !important;
-    margin-top: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+}
+
+/* Make Chatbot flex to fit exactly */
+.chatbot {
+    flex-grow: 1 !important;
+    min-height: 0 !important;
 }
 
 /* Sleek Minimal Header */
@@ -286,4 +301,4 @@ with gr.Blocks(title="Synapse AI Nexus") as demo:
     gr.HTML("<div style='text-align: center; margin-top: 20px; font-weight: bold; color: #f97316; letter-spacing: 2px;'><span style='display:inline-block; width:10px; height:10px; background-color:#10b981; border-radius:50%; margin-right:8px; animation: pulse-glow 2s infinite;'></span> ALL NEURAL SYSTEMS ONLINE</div>")
 
 if __name__ == "__main__":
-    demo.launch(theme=custom_theme, css=css)
+    demo.launch(theme=custom_theme, css=css, js="function() { document.body.classList.add('dark'); }")
