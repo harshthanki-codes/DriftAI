@@ -59,33 +59,26 @@ custom_theme = gr.themes.Default(
 )
 
 css = """
-/* Force light mode globally by overriding Gradio's internal CSS variables */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 :root, .dark, body, .gradio-container {
-    --background-fill-primary: #ffffff !important;
-    --background-fill-secondary: #fff7ed !important;
-    --border-color-primary: rgba(249, 115, 22, 0.2) !important;
-    --block-background-fill: rgba(255, 255, 255, 0.8) !important;
-    --block-border-color: rgba(249, 115, 22, 0.2) !important;
-    --panel-background-fill: #ffffff !important;
-    --body-text-color: #1e293b !important;
-    --body-text-color-subdued: #64748b !important;
-    --input-background-fill: #ffffff !important;
-    --input-border-color: rgba(249, 115, 22, 0.3) !important;
+    --background-fill-primary: #000000 !important;
+    --background-fill-secondary: #0a0a0a !important;
+    --border-color-primary: #27272a !important;
+    --border-color-accent: #3f3f46 !important;
+    --body-text-color: #ededed !important;
+    --body-text-color-subdued: #a1a1aa !important;
+    --button-primary-background-fill: #ededed !important;
+    --button-primary-text-color: #000000 !important;
+    --panel-background-fill: #000000 !important;
+    --input-background-fill: #0a0a0a !important;
+    font-family: 'Inter', sans-serif !important;
 }
 
-/* Stunning Mesh Gradient Background (Apple/Stripe Style) */
 body, .gradio-container { 
-    background-color: #ff9900 !important;
-    background-image: 
-        radial-gradient(at 40% 20%, hsla(28,100%,74%,1) 0px, transparent 50%),
-        radial-gradient(at 80% 0%, hsla(189,100%,56%,1) 0px, transparent 50%),
-        radial-gradient(at 0% 50%, hsla(355,100%,93%,1) 0px, transparent 50%),
-        radial-gradient(at 80% 50%, hsla(340,100%,76%,1) 0px, transparent 50%),
-        radial-gradient(at 0% 100%, hsla(22,100%,77%,1) 0px, transparent 50%),
-        radial-gradient(at 80% 100%, hsla(242,100%,70%,1) 0px, transparent 50%),
-        radial-gradient(at 0% 0%, hsla(343,100%,76%,1) 0px, transparent 50%) !important;
-    background-attachment: fixed !important;
-    color: #1e293b !important;
+    background-color: #000000 !important;
+    background-image: none !important;
+    color: #ededed !important;
 }
 
 /* Aggressively destroy all Gradio default top spacing */
@@ -94,150 +87,112 @@ body, .gradio-container {
     margin-top: 0 !important;
 }
 
-.glow-header { 
-    text-align: center; 
-    font-size: 5rem; 
-    font-weight: 900; 
-    background: linear-gradient(135deg, #f97316 0%, #ea580c 50%, #f59e0b 100%); 
-    -webkit-background-clip: text; 
-    -webkit-text-fill-color: transparent; 
-    margin: 0 !important; 
-    padding-top: 0 !important;
-    line-height: 1.1;
-    letter-spacing: -3px; 
-    text-shadow: 0 10px 30px rgba(249, 115, 22, 0.2);
-}
-
-.sub-header { 
-    text-align: center; 
-    color: #64748b; 
-    font-size: 1.2rem; 
-    font-weight: 600; 
-    letter-spacing: 6px; 
-    text-transform: uppercase; 
-    margin-top: 5px !important;
-    margin-bottom: 10px !important; 
-}
-
-/* Chatbot Specific Styling */
-.chatbot {
-    background-color: #ffffff !important;
-    border-radius: 20px !important;
-    box-shadow: 0 10px 30px rgba(249, 115, 22, 0.08) !important;
-    border: 1px solid rgba(249, 115, 22, 0.2) !important;
-}
-
-/* User Message Bubble */
-.message-wrap .message.user {
-    background: linear-gradient(90deg, #f97316 0%, #ea580c 100%) !important;
-    color: #ffffff !important;
-    border-radius: 20px 20px 4px 20px !important;
-    box-shadow: 0 4px 15px rgba(249, 115, 22, 0.2) !important;
-    border: none !important;
-}
-
-/* AI Message Bubble */
-.message-wrap .message.bot {
-    background: #fff7ed !important;
-    color: #1e293b !important;
-    border: 1px solid rgba(249, 115, 22, 0.2) !important;
-    border-radius: 20px 20px 20px 4px !important;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03) !important;
-}
-
-/* Input Area */
-textarea {
-    background-color: #ffffff !important;
-    color: #1e293b !important;
-    border: 1px solid rgba(249, 115, 22, 0.3) !important;
-    border-radius: 12px !important;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.02) !important;
-}
-textarea:focus {
-    border-color: #f97316 !important;
-    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15) !important;
-}
-
-/* General Layout Elements */
-.glass { 
-    background: rgba(255, 255, 255, 0.8) !important; 
-    border: 1px solid rgba(249, 115, 22, 0.1) !important; 
-    border-radius: 24px !important; 
-    box-shadow: 0 20px 40px 0 rgba(0, 0, 0, 0.05), 0 1px 3px 0 rgba(249, 115, 22, 0.1) !important; 
-    backdrop-filter: blur(20px) !important; 
-    -webkit-backdrop-filter: blur(20px) !important;
-    overflow: hidden;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-
-/* 🚀 NEW INTERACTIVE ANIMATIONS */
-.glass:hover {
-    transform: translateY(-4px) scale(1.005) !important;
-    box-shadow: 0 30px 60px 0 rgba(0, 0, 0, 0.08), 0 4px 12px 0 rgba(249, 115, 22, 0.2) !important;
-    border: 1px solid rgba(249, 115, 22, 0.3) !important;
-}
-
-/* Animated Shimmering Header */
+/* Sleek Minimal Header */
 .glow-header {
-    background: linear-gradient(to right, #ea580c, #f97316, #fbbf24, #ea580c) !important;
-    background-size: 300% auto !important;
-    color: transparent !important;
+    font-size: 2.5rem !important;
+    font-weight: 600 !important;
+    letter-spacing: -1.5px !important;
+    background: linear-gradient(to right, #ffffff, #888888) !important;
     -webkit-background-clip: text !important;
     background-clip: text !important;
-    animation: shimmer 4s linear infinite !important;
-    text-shadow: none !important;
+    color: transparent !important;
+    text-align: center;
+    margin-bottom: 5px !important;
 }
-@keyframes shimmer {
-    to { background-position: 300% center; }
-}
-
-/* Glowing Neon Inputs */
-textarea, input {
-    transition: all 0.3s ease !important;
-    border: 2px solid transparent !important;
-}
-textarea:focus, input:focus {
-    border-color: #f97316 !important;
-    box-shadow: 0 0 15px rgba(249, 115, 22, 0.4), inset 0 0 10px rgba(249, 115, 22, 0.1) !important;
-    transform: scale(1.01) !important;
+.sub-header {
+    color: #888888 !important;
+    font-size: 0.85rem !important;
+    text-align: center;
+    letter-spacing: 2px;
+    margin-bottom: 30px !important;
+    text-transform: uppercase;
 }
 
-.tab-nav button {
-    transition: all 0.3s ease !important;
-}
-.tab-nav button:hover {
-    color: #ea580c !important;
-    transform: translateY(-2px) !important;
-}
-
-/* Pulsing animated buttons */
-.gradio-button.primary {
-    background: linear-gradient(45deg, #ea580c, #f97316, #fbbf24, #ea580c) !important;
-    background-size: 300% 300% !important;
-    animation: gradient-shift 3s ease infinite !important;
-    color: white !important;
-    border: none !important;
-    font-weight: 800 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 1px !important;
-    border-radius: 12px !important;
+/* Minimalist Cards / Panels */
+.glass { 
+    background: #000000 !important; 
+    border: 1px solid #27272a !important; 
+    border-radius: 6px !important; 
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5) !important; 
+    overflow: hidden;
     transition: all 0.2s ease !important;
 }
+.glass:hover {
+    border-color: #3f3f46 !important;
+}
+
+/* Minimalist Inputs */
+textarea, input, .dropdown {
+    background-color: #0a0a0a !important;
+    color: #ededed !important;
+    border: 1px solid #27272a !important;
+    border-radius: 6px !important;
+    transition: all 0.2s ease !important;
+    font-size: 0.9rem !important;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.5) !important;
+}
+textarea:focus, input:focus {
+    border-color: #ededed !important;
+    box-shadow: 0 0 0 1px #ededed !important;
+    outline: none !important;
+}
+
+/* Tab Navigation */
+.tab-nav {
+    border-bottom: 1px solid #27272a !important;
+    background: transparent !important;
+}
+.tab-nav button {
+    color: #888888 !important;
+    border: none !important;
+    border-bottom: 2px solid transparent !important;
+    font-weight: 500 !important;
+    transition: color 0.2s ease !important;
+    border-radius: 0 !important;
+}
+.tab-nav button.selected {
+    color: #ededed !important;
+    border-bottom: 2px solid #ededed !important;
+}
+.tab-nav button:hover {
+    color: #ededed !important;
+}
+
+/* Primary Buttons */
+.gradio-button.primary {
+    background: #ededed !important;
+    color: #000000 !important;
+    font-weight: 600 !important;
+    border: none !important;
+    border-radius: 6px !important;
+    transition: all 0.2s ease !important;
+    box-shadow: none !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+}
 .gradio-button.primary:hover {
-    transform: scale(1.05) translateY(-2px) !important;
-    box-shadow: 0 10px 20px rgba(249, 115, 22, 0.4) !important;
+    background: #ffffff !important;
+    opacity: 0.9 !important;
+    transform: none !important;
 }
-@keyframes gradient-shift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+
+/* Message Bubbles */
+.message-wrap .message.user {
+    background: #27272a !important;
+    color: #ededed !important;
+    border-radius: 6px !important;
+    border: 1px solid #3f3f46 !important;
 }
-    box-shadow: 0 12px 30px rgba(234, 88, 12, 0.4) !important;
+.message-wrap .message.bot {
+    background: #000000 !important;
+    color: #ededed !important;
+    border: 1px solid #27272a !important;
+    border-radius: 6px !important;
 }
 """
 
-with gr.Blocks(title="Drift AI Nexus") as demo:
-    gr.HTML("<h1 class='glow-header'>DRIFT AI</h1><div class='sub-header'>Neural Interface Nexus</div>")
+with gr.Blocks(title="Synapse AI Nexus") as demo:
+    gr.HTML("<h1 class='glow-header'>SYNAPSE AI</h1><div class='sub-header'>Neural Interface Nexus</div>")
     
     with gr.Tabs(elem_classes="glass"):
         with gr.TabItem("📡 Core 1: Neural Researcher"):
